@@ -13,75 +13,73 @@
 </head>
 
 <body>
-  <main class="main">
-    <section class="menu">
-      <div class="wrapper">
-        <div class="menu__logo">
+  <main class="app">
+    <div class="app-menu">
+      <div class=" wrapper">
+        <div class="app-menu__logo">
           <img src="./dist/img/icons/logo.svg" alt="">
         </div>
-
-        <div class="menu__box">
-          <p class="menu__box-title"> Pick player 1's mark</p>
-          <div class="menu__box-btns">
-            <button data-team="x" class="menu__box-btn">
+        <div class="app-menu__box">
+          <p class="app-menu__box-title"> Pick player 1's mark</p>
+          <div class="app-menu__box-btns">
+            <button data-team="x" class="app-menu__box-btn">
               <img src="./dist/img/icons/icon-x.svg" alt="">
             </button>
-            <button data-team="o" class="menu__box-btn menu__box-btn--active">
+            <button data-team="o" class="app-menu__box-btn app-menu__box-btn--active">
               <img src="./dist/img/icons/icon-o.svg" alt="">
             </button>
           </div>
-          <p class="menu__box-info">Remember: X goes first</p>
+          <p class="app-menu__box-info">Remember: X goes first</p>
         </div>
-
-        <div class="menu__btns">
-          <button data-mode="solo" class="menu__btns-btn menu__btns-btn--solo">New Game (vs CPU)</button>
-          <button data-mode="multi" class="menu__btns-btn menu__btns-btn--multi">New Game (vs player)</button>
+        <div class="app-menu__btns">
+          <button data-mode="solo" class="app-menu__btns-btn app-menu__btns-btn--solo">New Game (vs CPU)</button>
+          <button data-mode="multi" class="app-menu__btns-btn app-menu__btns-btn--multi">New Game (vs player)</button>
         </div>
 
       </div>
-    </section>
+    </div>
 
-    <section class="app">
-      <div class="wrapper">
-        <div class="app__nav">
-          <img src="./dist/img/icons/logo.svg" alt="" class="app__nav-logo">
-          <div class="app__nav-info">
-            <img class="app__nav-info-img" src="./dist/img/icons/icon-x.svg" alt="">
-            <span class="app__nav-info-text">turn</span>
+    <div class="app-main">
+      <div class=" wrapper">
+        <div class="app-main__nav">
+          <img src="./dist/img/icons/logo.svg" alt="" class="app-main__nav-logo">
+          <div class="app-main__nav-info">
+            <img class="app-main__nav-info-img" src="./dist/img/icons/icon-x.svg" alt="">
+            <span class="app-main__nav-info-text">turn</span>
           </div>
-          <button class="app__nav-restart-btn"><img src="./dist/img/icons/icon-restart.svg" alt=""></button>
+          <button class="app-main__nav-restart-btn"><img src="./dist/img/icons/icon-restart.svg" alt=""></button>
         </div>
-        <div class="app__body">
-          <div class="app__body-boxes">
-            <div tabindex="0" class="app__body-box"></div>
-            <div tabindex="0" class="app__body-box"></div>
-            <div tabindex="0" class="app__body-box"></div>
-            <div tabindex="0" class="app__body-box"></div>
-            <!-- <div class="app__body-box app__body-box--used">
-              <img src="./dist/img/icons/icon-o.svg" alt="" class="app__body-box-img">
+        <div class="app-main__body">
+          <div class="app-main__body-boxes">
+            <div tabindex="0" class="app-main__body-box"></div>
+            <div tabindex="0" class="app-main__body-box"></div>
+            <div tabindex="0" class="app-main__body-box"></div>
+            <div tabindex="0" class="app-main__body-box"></div>
+            <!-- <div class="app-main__body-box app-main__body-box--used">
+              <img src="./dist/img/icons/icon-o.svg" alt="" class="app-main__body-box-img">
             </div> -->
-            <div tabindex="0" class="app__body-box"></div>
-            <div tabindex="0" class="app__body-box"></div>
-            <div tabindex="0" class="app__body-box"></div>
-            <div tabindex="0" class="app__body-box"></div>
-            <div tabindex="0" class="app__body-box"></div>
+            <div tabindex="0" class="app-main__body-box"></div>
+            <div tabindex="0" class="app-main__body-box"></div>
+            <div tabindex="0" class="app-main__body-box"></div>
+            <div tabindex="0" class="app-main__body-box"></div>
+            <div tabindex="0" class="app-main__body-box"></div>
 
-            <div class="app__body-summary app__body-summary--p2">
-              <span class="app__body-summary-title">x (p2)</span>
-              <span class="app__body-summary-number">--</span>
+            <div class="app-main__body-summary app-main__body-summary--p2">
+              <span class="app-main__body-summary-title">x (p2)</span>
+              <span class="app-main__body-summary-number">--</span>
             </div>
-            <div class="app__body-summary app__body-summary--ties">
-              <span class="app__body-summary-title">ties</span>
-              <span class="app__body-summary-number">--</span>
+            <div class="app-main__body-summary app-main__body-summary--ties">
+              <span class="app-main__body-summary-title">ties</span>
+              <span class="app-main__body-summary-number">--</span>
             </div>
-            <div class="app__body-summary app__body-summary--p1">
-              <span class="app__body-summary-title">o (p1)</span>
-              <span class="app__body-summary-number">--</span>
+            <div class="app-main__body-summary app-main__body-summary--p1">
+              <span class="app-main__body-summary-title">o (p1)</span>
+              <span class="app-main__body-summary-number">--</span>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
 
     <div class="summary-board summary-board--restart">
       <div class="summary-board-shadow summary-board-shadow--top"></div>
@@ -99,6 +97,15 @@
       <p class="summary-board__title">round tied</p>
       <button class="summary-board__btn summary-board__btn--cancel">quit</button>
       <button class="summary-board__btn summary-board__btn--confirm">next round</button>
+    </div>
+
+    <div class="summary-board summary-board--difficulty">
+      <div class="summary-board-shadow summary-board-shadow--top"></div>
+      <div class="summary-board-shadow summary-board-shadow--bottom"></div>
+      <p class="summary-board__title">choose a difficulty level</p>
+      <button class="summary-board__btn summary-board__btn--easy">easy</button>
+      <button class="summary-board__btn summary-board__btn--normal">normal</button>
+      <button class="summary-board__btn summary-board__btn--hard">hard</button>
     </div>
 
   </main>

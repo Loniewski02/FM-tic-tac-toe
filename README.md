@@ -39,8 +39,8 @@ Then crop/optimize/edit your image however you like, add it to your project, and
 
 ### Links
 
-- Solution URL: [Add solution URL here](https://your-solution-url.com)
-- Live Site URL: [Add live site URL here](https://your-live-site-url.com)
+- Solution URL: [Solution]()
+- Live Site URL: [Live](https://loniewski02.github.io/FM-tic-tac-toe/)
 
 ## My process
 
@@ -83,5 +83,5 @@ If you want more help with writing markdown, we'd recommend checking out [The Ma
 
 ## Author
 
-- Website - [Add your name here](https://www.your-site.com)
-- Frontend Mentor - [@yourusername](https://www.frontendmentor.io/profile/yourusername)
+- Website - [Portfolio](https://loniewski02.github.io/portfolio/)
+- Frontend Mentor - [@Loniewski02](https://www.frontendmentor.io/profile/Loniewski02)
