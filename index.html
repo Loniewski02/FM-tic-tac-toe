@@ -85,9 +85,9 @@
       <div class="summary-board-shadow summary-board-shadow--top"></div>
       <div class="summary-board-shadow summary-board-shadow--bottom"></div>
       <p class="summary-board__title">restart game?</p>
-      <button class="summary-board__btn summary-board__btn--cancel">no,
+      <button class="summary-board__btn summary-board__btn-restart--cancel summary-board__btn--cancel">no,
         cancel</button>
-      <button class="summary-board__btn summary-board__btn--confirm">yes,
+      <button class="summary-board__btn summary-board__btn-restart--confirm summary-board__btn--confirm">yes,
         restart</button>
     </div>
 
@@ -95,8 +95,19 @@
       <div class="summary-board-shadow summary-board-shadow--top"></div>
       <div class="summary-board-shadow summary-board-shadow--bottom"></div>
       <p class="summary-board__title">round tied</p>
-      <button class="summary-board__btn summary-board__btn--cancel">quit</button>
-      <button class="summary-board__btn summary-board__btn--confirm">next round</button>
+      <button class="summary-board__btn summary-board__btn--cancel quit-game">quit</button>
+      <button class="summary-board__btn summary-board__btn--confirm new-game">next
+        round</button>
+    </div>
+
+    <div class="summary-board summary-board--win">
+      <div class="summary-board-shadow summary-board-shadow--top"></div>
+      <div class="summary-board-shadow summary-board-shadow--bottom"></div>
+      <p class="summary-board__win-info">Player <span>2</span> wins!</p>
+      <p class="summary-board__title"><img src="./dist/img/icons/icon-o.svg" alt=""> takes the round</p>
+      <button class="summary-board__btn summary-board__btn--cancel quit-game">quit</button>
+      <button class="summary-board__btn summary-board__btn--confirm new-game">next
+        round</button>
     </div>
 
     <div class="summary-board summary-board--difficulty">
