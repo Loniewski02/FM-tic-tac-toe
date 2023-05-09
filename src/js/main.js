@@ -1,27 +1,27 @@
-let menu;
-let startGameBtns;
 let teamBtns;
-let appMain;
 let appBoxes;
-let restartBtn;
-let cancelRestartBtn;
-let confirmRestartBtn;
-let newGameBtn;
-let quitGameBtn;
-let currentTurn;
+let startMultiplayerGameBtn;
+let startSingleplayerGameBtn;
+let currentTurnInfo;
+let p1PointsStatus;
+let p2PointsStatus;
 let tiesStatus;
 let summaryBoardWin;
 let summaryBoardWinner;
-let player1PointsStatus;
-let player2PointsStatus;
-let cpu;
+let newGameBtn;
+let quitGameBtn;
+let restartBtn;
+let cancelRestartBtn;
+let confirmRestartBtn;
+let difficultyBtns;
 
-let team = 'x';
+let startingTeam = 'x';
 let playerTeam = 'o';
+let cpuTeam = 'x';
 let ties = 0;
 let p1Points = 0;
 let p2Points = 0;
-let gameMode;
+
 const winConditions = [
 	[0, 1, 2],
 	[3, 4, 5],
@@ -39,53 +39,53 @@ const main = () => {
 };
 
 const prepareDOMElements = () => {
-	menu = document.querySelector('.app-menu');
 	teamBtns = document.querySelectorAll('.app-menu__box-btn');
-	startGameBtns = document.querySelectorAll('.app-menu__btns-btn');
-	appMain = document.querySelector('.app-main');
+	startMultiplayerGameBtn = document.querySelector('.app-menu__btns-btn--multi');
+	startSingleplayerGameBtn = document.querySelector('.app-menu__btns-btn--solo');
+	currentTurnInfo = document.querySelector('.app-main__nav-info-img');
+	p1PointsStatus = document.querySelector('.app-main__body-summary--p1 .app-main__body-summary-number');
+	p2PointsStatus = document.querySelector('.app-main__body-summary--p2 .app-main__body-summary-number');
+	tiesStatus = document.querySelector('.app-main__body-summary--ties .app-main__body-summary-number');
 	appBoxes = document.querySelectorAll('.app-main__body-box');
+
+	difficultyBtns = document.querySelectorAll('.difficulty-btn');
+	summaryBoardWin = document.querySelector('.summary-board--win');
+	summaryBoardWinner = document.querySelector('.summary-board__win-info span');
+	newGameBtn = document.querySelectorAll('.new-game');
+	quitGameBtn = document.querySelectorAll('.quit-game');
 	restartBtn = document.querySelector('.app-main__nav-restart-btn');
 	cancelRestartBtn = document.querySelector('.summary-board__btn-restart--cancel');
 	confirmRestartBtn = document.querySelector('.summary-board__btn-restart--confirm');
-	newGameBtn = document.querySelectorAll('.new-game');
-	quitGameBtn = document.querySelectorAll('.quit-game');
-	currentTurn = document.querySelector('.app-main__nav-info-img');
-	tiesStatus = document.querySelector('.app-main__body-summary--ties .app-main__body-summary-number');
-	player2PointsStatus = document.querySelector('.app-main__body-summary--p2 .app-main__body-summary-number');
-	player1PointsStatus = document.querySelector('.app-main__body-summary--p1 .app-main__body-summary-number');
-	summaryBoardWin = document.querySelector('.summary-board--win');
-	summaryBoardWinner = document.querySelector('.summary-board__win-info span');
 };
 
 const prepareDOMEvents = () => {
 	menuAnimationIn();
+	startMultiplayerGameBtn.addEventListener('click', openMultiplayerGame);
+	startSingleplayerGameBtn.addEventListener('click', openSingleplayerMenu);
 	teamBtns.forEach(btn => btn.addEventListener('click', handleTeam));
-
-	startGameBtns.forEach(btn =>
-		btn.addEventListener('click', e => {
-			gameMode = e.target.dataset.mode;
-			startGame();
-		})
-	);
-
+	newGameBtn.forEach(btn => btn.addEventListener('click', resetGame));
+	quitGameBtn.forEach(btn => btn.addEventListener('click', backToMenu));
+	difficultyBtns.forEach(btn => {
+		btn.addEventListener('click', openSingleplayerGame);
+	});
 	restartBtn.addEventListener('click', () => {
 		summaryBoardAnimationIn('.summary-board--restart');
 	});
 	cancelRestartBtn.addEventListener('click', () => {
 		summaryBoardAnimationOut('.summary-board--restart');
 	});
-
 	confirmRestartBtn.addEventListener('click', backToMenu);
+};
 
+const clearWinnerBoardClass = () => {
+	summaryBoardWin.classList.remove(`summary-board--win-x`);
+	summaryBoardWin.classList.remove(`summary-board--win-o`);
+};
+
+const disableBoxes = () => {
 	appBoxes.forEach(box => {
-		box.addEventListener('click', handleBoxClick);
-		box.addEventListener('mouseenter', handleBoxHover);
-		box.addEventListener('mouseleave', handleBoxLeave);
+		box.classList.add('app-main__body-box--used');
 	});
-
-	newGameBtn.forEach(btn => btn.addEventListener('click', resetGame));
-
-	quitGameBtn.forEach(btn => btn.addEventListener('click', backToMenu));
 };
 
 const clearBoxes = () => {
@@ -93,13 +93,9 @@ const clearBoxes = () => {
 		box.classList.remove('app-main__body-box--used');
 		box.style.backgroundColor = '#1f3641';
 		box.style.backgroundImage = '';
+		box.style.transform = '';
 		box.innerHTML = '';
 	});
-};
-
-const clearWinnerBoardClass = () => {
-	summaryBoardWin.classList.remove(`summary-board--win-x`);
-	summaryBoardWin.classList.remove(`summary-board--win-y`);
 };
 
 const backToMenu = () => {
@@ -109,8 +105,8 @@ const backToMenu = () => {
 		ties = 0;
 		p1Points = 0;
 		p2Points = 0;
-		player1PointsStatus.textContent = '--';
-		player2PointsStatus.textContent = '--';
+		p1PointsStatus.textContent = '--';
+		p2PointsStatus.textContent = '--';
 		tiesStatus.textContent = '--';
 		clearBoxes();
 		menuAnimationIn();
@@ -126,14 +122,14 @@ const resetGame = () => {
 	}, 1000);
 };
 
-const handleTeam = e => {
+const handleTeam = () => {
 	teamBtns.forEach(btn => {
 		if (btn.classList.contains('app-menu__box-btn--active')) {
 			btn.classList.toggle('app-menu__box-btn--active');
 		} else return;
 	});
 
-	teamPick(e);
+	teamPick(event);
 };
 
 const teamPick = e => {
@@ -142,62 +138,98 @@ const teamPick = e => {
 
 	if (target.classList.contains('app-menu__box-btn--active')) {
 		playerTeam = target.dataset.team;
+
+		if (playerTeam === 'x') {
+			cpuTeam = 'o';
+		} else if (playerTeam === 'o') {
+			cpuTeam = 'x';
+		}
 	}
 };
 
-const startGame = () => {
-	currentTurn.setAttribute('src', `./dist/img/icons/icon-x.svg`);
-	switch (gameMode) {
-		case 'solo':
-			summaryBoardAnimationIn('.summary-board--difficulty');
-			soloGame();
-			break;
-		case 'multi':
-			menuAnimationOut();
-			mainAppAnimationIn();
-			handleBoxClick();
-			break;
-	}
+const openMultiplayerGame = () => {
+	menuAnimationOut();
+	mainAppAnimationIn();
+	startMultiplayerGame();
 };
 
-const handleBoxClick = e => {
+const startMultiplayerGame = () => {
+	appBoxes.forEach(box => {
+		box.addEventListener('mouseenter', () => {
+			handleBoxHover(event, startingTeam);
+		});
+		box.addEventListener('mouseleave', handleBoxLeave);
+		box.addEventListener('click', multiplayerGame);
+	});
+};
+
+const multiplayerGame = e => {
 	const clickedBox = e.target;
 
 	if (!clickedBox.classList.contains('app-main__body-box--used')) {
 		clickedBox.classList.add('app-main__body-box--used');
 		clickedBox.style.backgroundImage = '';
-		clickedBox.innerHTML = `<img src="./dist/img/icons/icon-${team}.svg" alt="" class="app-main__body-box-img">`;
+		clickedBox.innerHTML = `<img src="./dist/img/icons/icon-${startingTeam}.svg" alt="" class="app-main__body-box-img">`;
 
-		if (checkWin(team)) {
-			if (team === 'x') {
-				p2Points++;
-				player2PointsStatus.textContent = p2Points;
-				summaryBoardWinner.textContent = '2';
-			} else {
+		if (checkWin(startingTeam)) {
+			disableBoxes();
+			if (startingTeam === 'x') {
 				p1Points++;
-				player1PointsStatus.textContent = p1Points;
+				p1PointsStatus.textContent = p1Points;
 				summaryBoardWinner.textContent = '1';
+			} else {
+				p2Points++;
+				p2PointsStatus.textContent = p2Points;
+				summaryBoardWinner.textContent = '2';
 			}
-			summaryBoardWin.classList.add(`summary-board--win-${team}`);
+			summaryBoardWin.classList.add(`summary-board--win-${startingTeam}`);
 
 			setTimeout(() => {
-				summaryBoardAnimationIn(`.summary-board--win-${team}`);
+				summaryBoardAnimationIn(`.summary-board--win-${startingTeam}`);
+				startingTeam = 'x';
 			}, 500);
-
-			setTimeout(() => {
-				team = 'x';
-			}, 600);
 		} else if (checkTie()) {
+			disableBoxes();
 			ties++;
 			tiesStatus.textContent = ties;
 			summaryBoardAnimationIn('.summary-board--tied');
-			team = 'x';
+			startingTeam = 'x';
 		} else {
-			team = team === 'o' ? 'x' : 'o';
-			currentTurn.setAttribute('src', `./dist/img/icons/icon-${team}.svg`);
+			startingTeam = startingTeam === 'o' ? 'x' : 'o';
+			currentTurnInfo.setAttribute('src', `./dist/img/icons/icon-${startingTeam}.svg`);
 		}
 	}
 };
+
+const openSingleplayerMenu = () => {
+	summaryBoardAnimationIn('.summary-board--difficulty');
+};
+
+const openSingleplayerGame = () => {
+	summaryBoardAnimationOut('.summary-board--difficulty');
+	setTimeout(() => {
+		menuAnimationOut();
+		mainAppAnimationIn();
+		singleplayerGame();
+	}, 500);
+};
+
+const startSingleplayerGame = () => {
+	getDifficulty();
+	appBoxes.forEach(box => {
+		box.addEventListener('mouseenter', () => {
+			handleBoxHover(event, playerTeam);
+		});
+		box.addEventListener('mouseleave', handleBoxLeave);
+		box.addEventListener('click', singleplayerGame);
+	});
+};
+
+const getDifficulty = e => {
+	const difficulty = e.target.textContent;
+};
+
+const singleplayerGame = params => {};
 
 const checkWin = team => {
 	for (const condition of winConditions) {
@@ -211,6 +243,7 @@ const checkWin = team => {
 		) {
 			winningBoxes.forEach(box => {
 				box.style.backgroundColor = team === 'o' ? '#ffc860' : '#31c3bd';
+				box.style.transform = 'scale(1.1)';
 				const img = box.querySelector('img');
 				img.style.filter = `brightness(0) saturate(100%) invert(12%) sepia(6%) saturate(3580%) hue-rotate(158deg) brightness(97%) contrast(91%)`;
 			});
@@ -228,13 +261,11 @@ const checkTie = () => {
 	return false;
 };
 
-const soloGame = team => {};
-
-const handleBoxHover = e => {
+const handleBoxHover = (e, tm) => {
 	const hoveredBox = e.target;
 
 	if (!hoveredBox.classList.contains('app-main__body-box--used')) {
-		hoveredBox.style.backgroundImage = `url(./dist/img/icons/icon-${team}-outline.svg)`;
+		hoveredBox.style.backgroundImage = `url(./dist/img/icons/icon-${tm}-outline.svg)`;
 	}
 };
 
@@ -246,7 +277,7 @@ const handleBoxLeave = e => {
 	}
 };
 
-document.addEventListener('DOMContentLoaded', main);
+//GASP animations...
 
 const menuAnimationIn = () => {
 	gsap.to('.app-menu', { duration: 1, opacity: '1', height: '100%', top: 0 });
@@ -279,7 +310,7 @@ const summaryBoardAnimationOut = element => {
 };
 
 const mainAppAnimationIn = () => {
-	gsap.to('.app-main', { duration: 1, bottom: '0', opacity: '1', height: '100%' });
+	gsap.to('.app-main', { duration: 1, bottom: '0', opacity: '1', height: '100%', display: 'flex' });
 	gsap.to('.app-main__body-box', {
 		duration: 0.5,
 		delay: 0.8,
@@ -302,3 +333,5 @@ const mainAppAnimationOut = () => {
 		opacity: '0',
 	});
 };
+
+document.addEventListener('DOMContentLoaded', main);

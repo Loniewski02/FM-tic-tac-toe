@@ -17,7 +17,7 @@ body {
 	font-family: 'Outfit', sans-serif;
 	font-size: 1.6rem;
 	background-color: $very-dark-graylish-blue;
-	overflow: hidden;
+	// overflow: hidden;
 }
 
 .wrapper {
@@ -169,7 +169,7 @@ body {
 	left: 0;
 	right: 0;
 	bottom: -110%;
-	display: flex;
+	display: none;
 	justify-content: center;
 	padding: 1.45em;
 	height: 0;
@@ -295,7 +295,7 @@ body {
 				letter-spacing: 1.25px;
 			}
 
-			&--p2 {
+			&--p1 {
 				background-color: $blue;
 			}
 
@@ -303,7 +303,7 @@ body {
 				background-color: $gray;
 			}
 
-			&--p1 {
+			&--p2 {
 				background-color: $orange;
 			}
 		}
@@ -539,14 +539,14 @@ body {
 
 @keyframes grow {
 	0% {
-		transform: scale(0);
+		transform: scale(0) rotate(0);
 	}
 
 	70% {
-		transform: scale(1.1);
+		transform: scale(1.1) rotate(-90deg);
 	}
 
 	100% {
-		transform: scale(1);
+		transform: scale(1) rotate(0);
 	}
 }
