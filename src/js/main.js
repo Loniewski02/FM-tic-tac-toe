@@ -4,7 +4,9 @@ let startMultiplayerGameBtn;
 let startSingleplayerGameBtn;
 let currentTurnInfo;
 let p1PointsStatus;
+let p1PointsTitle;
 let p2PointsStatus;
+let p2PointsTitle;
 let tiesStatus;
 let summaryBoardWin;
 let summaryBoardWinner;
@@ -15,6 +17,8 @@ let cancelRestartBtn;
 let confirmRestartBtn;
 let difficultyBtns;
 
+let isComputerTurn = false;
+let difficultyLevel;
 let startingTeam = 'x';
 let playerTeam = 'o';
 let cpuTeam = 'x';
@@ -44,13 +48,15 @@ const prepareDOMElements = () => {
 	startSingleplayerGameBtn = document.querySelector('.app-menu__btns-btn--solo');
 	currentTurnInfo = document.querySelector('.app-main__nav-info-img');
 	p1PointsStatus = document.querySelector('.app-main__body-summary--p1 .app-main__body-summary-number');
+	p1PointsTitle = document.querySelector('.app-main__body-summary--p1 .app-main__body-summary-title');
 	p2PointsStatus = document.querySelector('.app-main__body-summary--p2 .app-main__body-summary-number');
+	p2PointsTitle = document.querySelector('.app-main__body-summary--p2 .app-main__body-summary-title');
 	tiesStatus = document.querySelector('.app-main__body-summary--ties .app-main__body-summary-number');
 	appBoxes = document.querySelectorAll('.app-main__body-box');
 
 	difficultyBtns = document.querySelectorAll('.difficulty-btn');
 	summaryBoardWin = document.querySelector('.summary-board--win');
-	summaryBoardWinner = document.querySelector('.summary-board__win-info span');
+	summaryBoardWinner = document.querySelector('.summary-board__win-info');
 	newGameBtn = document.querySelectorAll('.new-game');
 	quitGameBtn = document.querySelectorAll('.quit-game');
 	restartBtn = document.querySelector('.app-main__nav-restart-btn');
@@ -65,9 +71,6 @@ const prepareDOMEvents = () => {
 	teamBtns.forEach(btn => btn.addEventListener('click', handleTeam));
 	newGameBtn.forEach(btn => btn.addEventListener('click', resetGame));
 	quitGameBtn.forEach(btn => btn.addEventListener('click', backToMenu));
-	difficultyBtns.forEach(btn => {
-		btn.addEventListener('click', openSingleplayerGame);
-	});
 	restartBtn.addEventListener('click', () => {
 		summaryBoardAnimationIn('.summary-board--restart');
 	});
@@ -159,6 +162,7 @@ const startMultiplayerGame = () => {
 			handleBoxHover(event, startingTeam);
 		});
 		box.addEventListener('mouseleave', handleBoxLeave);
+		box.removeEventListener('click', singleplayerGame);
 		box.addEventListener('click', multiplayerGame);
 	});
 };
@@ -176,11 +180,13 @@ const multiplayerGame = e => {
 			if (startingTeam === 'x') {
 				p1Points++;
 				p1PointsStatus.textContent = p1Points;
-				summaryBoardWinner.textContent = '1';
+				p1PointsTitle.textContent = `x (p1)`;
+				summaryBoardWinner.textContent = `player 1 wins!`;
 			} else {
 				p2Points++;
 				p2PointsStatus.textContent = p2Points;
-				summaryBoardWinner.textContent = '2';
+				p2PointsTitle.textContent = `o (p2)`;
+				summaryBoardWinner.textContent = `player 2 wins!`;
 			}
 			summaryBoardWin.classList.add(`summary-board--win-${startingTeam}`);
 
@@ -203,6 +209,9 @@ const multiplayerGame = e => {
 
 const openSingleplayerMenu = () => {
 	summaryBoardAnimationIn('.summary-board--difficulty');
+	difficultyBtns.forEach(btn => {
+		btn.addEventListener('click', getDifficulty);
+	});
 };
 
 const openSingleplayerGame = () => {
@@ -212,24 +221,118 @@ const openSingleplayerGame = () => {
 		mainAppAnimationIn();
 		singleplayerGame();
 	}, 500);
-};
-
-const startSingleplayerGame = () => {
-	getDifficulty();
-	appBoxes.forEach(box => {
-		box.addEventListener('mouseenter', () => {
-			handleBoxHover(event, playerTeam);
-		});
-		box.addEventListener('mouseleave', handleBoxLeave);
-		box.addEventListener('click', singleplayerGame);
-	});
+	startSingleplayerGame();
 };
 
 const getDifficulty = e => {
-	const difficulty = e.target.textContent;
+	const difficulty = e.target.dataset.difficulty;
+	difficultyLevel = difficulty;
+	openSingleplayerGame();
 };
 
-const singleplayerGame = params => {};
+const startSingleplayerGame = () => {
+	appBoxes.forEach(box => {
+		box.addEventListener('mouseenter', e => {
+			handleBoxHover(e, playerTeam);
+		});
+		box.addEventListener('mouseleave', handleBoxLeave);
+		box.removeEventListener('click', multiplayerGame);
+		box.addEventListener('click', singleplayerGame);
+	});
+
+	if (playerTeam === 'o' && cpuTeam === 'x') {
+		const emptyBoxes = Array.from(document.querySelectorAll('.app-main__body-box:not(.app-main__body-box--used)'));
+		if (difficultyLevel === 'easy') {
+			setTimeout(() => {
+				makeEasyMove(emptyBoxes);
+			}, 500);
+		}
+	}
+};
+
+const changeTeams = () => {
+	if (playerTeam === 'x') {
+		p1PointsTitle.textContent = `${playerTeam}(player)`;
+		p2PointsTitle.textContent = `${cpuTeam}(CPU)`;
+	} else if (playerTeam === 'o') {
+		p2PointsTitle.textContent = `${playerTeam}(player)`;
+		p1PointsTitle.textContent = `${cpuTeam}(CPU)`;
+	}
+};
+
+const singleplayerGame = e => {
+	const emptyBoxes = Array.from(document.querySelectorAll('.app-main__body-box:not(.app-main__body-box--used)'));
+	let playerWin;
+	changeTeams();
+
+	const clickedBox = e.target;
+	if (!clickedBox.classList.contains('app-main__body-box--used') && !isComputerTurn) {
+		clickedBox.classList.add('app-main__body-box--used');
+		clickedBox.style.backgroundImage = '';
+		clickedBox.innerHTML = `<img src="./dist/img/icons/icon-${playerTeam}.svg" alt="" class="app-main__body-box-img">`;
+		playerWin = handleMoveResult(playerTeam, 'you won!');
+	}
+
+	if (difficultyLevel === 'easy') {
+		if (!playerWin && emptyBoxes.length > 1) {
+			isComputerTurn = true;
+			setTimeout(() => {
+				makeEasyMove(emptyBoxes);
+				handleMoveResult(cpuTeam, 'oh no, you lost ...');
+				isComputerTurn = false;
+			}, 500);
+		}
+	}
+};
+
+const makeEasyMove = boxes => {
+	const emptyBoxes = Array.isArray(boxes)
+		? boxes.filter(box => !box.classList.contains('app-main__body-box--used'))
+		: [];
+
+	if (emptyBoxes.length > 0) {
+		const randomIndex = Math.floor(Math.random() * emptyBoxes.length);
+		const randomBox = emptyBoxes[randomIndex];
+		randomBox.classList.add('app-main__body-box--used');
+		randomBox.style.backgroundImage = '';
+		randomBox.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
+	}
+};
+
+const handleMoveResult = (tm, info) => {
+	if (checkWin(tm)) {
+		disableBoxes();
+		if (tm === 'o') {
+			p2Points++;
+			p2PointsStatus.textContent = p2Points;
+			summaryBoardWinner.textContent = info;
+		} else {
+			p1Points++;
+			p1PointsStatus.textContent = p1Points;
+			summaryBoardWinner.textContent = info;
+		}
+		summaryBoardWin.classList.add(`summary-board--win-${tm}`);
+
+		setTimeout(() => {
+			summaryBoardAnimationIn(`.summary-board--win-${tm}`);
+		}, 500);
+
+		return true;
+	} else if (checkTie()) {
+		disableBoxes();
+		ties++;
+		tiesStatus.textContent = ties;
+		summaryBoardAnimationIn('.summary-board--tied');
+
+		return false;
+	} else {
+		startingTeam = startingTeam === 'o' ? 'x' : 'o';
+		currentTurnInfo.setAttribute('src', `./dist/img/icons/icon-${startingTeam}.svg`);
+		return;
+	}
+
+	return false;
+};
 
 const checkWin = team => {
 	for (const condition of winConditions) {
@@ -327,6 +430,7 @@ const mainAppAnimationIn = () => {
 
 const mainAppAnimationOut = () => {
 	gsap.to('.app-main', { duration: 1, delay: 0.8, bottom: '-50%', opacity: '0', height: '0' });
+	gsap.to('.app-main', { duration: 0.1, delay: 1.5, display: 'none' });
 	gsap.to('.app-main__body-box', {
 		duration: 0.2,
 		delay: 0.6,
