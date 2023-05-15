@@ -20,6 +20,7 @@ let difficultyBtns;
 let isComputerTurn = false;
 let difficultyLevel;
 let startingTeam = 'x';
+let startingTeamSingleplayer = 'x';
 let playerTeam = 'o';
 let cpuTeam = 'x';
 let ties = 0;
@@ -98,6 +99,9 @@ const clearBoxes = () => {
 		box.style.backgroundImage = '';
 		box.style.transform = '';
 		box.innerHTML = '';
+		if (difficultyLevel === 'easy' || difficultyLevel === 'medium' || difficultyLevel === 'hard') {
+			box.addEventListener('click', singleplayerGame);
+		}
 	});
 };
 
@@ -168,6 +172,7 @@ const startMultiplayerGame = () => {
 };
 
 const multiplayerGame = e => {
+	difficultyLevel = 'multiplayer';
 	const clickedBox = e.target;
 
 	if (!clickedBox.classList.contains('app-main__body-box--used')) {
@@ -239,15 +244,6 @@ const startSingleplayerGame = () => {
 		box.removeEventListener('click', multiplayerGame);
 		box.addEventListener('click', singleplayerGame);
 	});
-
-	if (playerTeam === 'o' && cpuTeam === 'x') {
-		const emptyBoxes = Array.from(document.querySelectorAll('.app-main__body-box:not(.app-main__body-box--used)'));
-		if (difficultyLevel === 'easy') {
-			setTimeout(() => {
-				makeEasyMove(emptyBoxes);
-			}, 500);
-		}
-	}
 };
 
 const changeTeams = () => {
@@ -271,6 +267,7 @@ const singleplayerGame = e => {
 		clickedBox.style.backgroundImage = '';
 		clickedBox.innerHTML = `<img src="./dist/img/icons/icon-${playerTeam}.svg" alt="" class="app-main__body-box-img">`;
 		playerWin = handleMoveResult(playerTeam, 'you won!');
+		clickedBox.removeEventListener('click', singleplayerGame);
 	}
 
 	if (difficultyLevel === 'easy') {
@@ -282,21 +279,83 @@ const singleplayerGame = e => {
 				isComputerTurn = false;
 			}, 500);
 		}
+	} else if (difficultyLevel === 'medium') {
+		if (!playerWin && emptyBoxes.length > 1) {
+			isComputerTurn = true;
+			setTimeout(() => {
+				makeNormalMove(emptyBoxes);
+				handleMoveResult(cpuTeam, 'oh no, you lost ...');
+				isComputerTurn = false;
+			}, 500);
+		}
+	} else if (difficultyLevel === 'hard') {
+		if (!playerWin && emptyBoxes.length > 1) {
+			isComputerTurn = true;
+			setTimeout(() => {
+				makeHardMove(emptyBoxes);
+				handleMoveResult(cpuTeam, 'oh no, you lost ...');
+				isComputerTurn = false;
+			}, 500);
+		}
 	}
 };
 
-const makeEasyMove = boxes => {
-	const emptyBoxes = Array.isArray(boxes)
-		? boxes.filter(box => !box.classList.contains('app-main__body-box--used'))
-		: [];
+const makeEasyMove = () => {
+	const emptyBoxes = Array.from(document.querySelectorAll('.app-main__body-box:not(.app-main__body-box--used)'));
+	const randomIndex = Math.floor(Math.random() * emptyBoxes.length);
+	const randomBox = emptyBoxes[randomIndex];
+	randomBox.classList.add('app-main__body-box--used');
+	randomBox.style.backgroundImage = '';
+	randomBox.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
+	randomBox.removeEventListener('click', singleplayerGame);
+};
 
-	if (emptyBoxes.length > 0) {
-		const randomIndex = Math.floor(Math.random() * emptyBoxes.length);
-		const randomBox = emptyBoxes[randomIndex];
-		randomBox.classList.add('app-main__body-box--used');
-		randomBox.style.backgroundImage = '';
-		randomBox.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
+const makeNormalMove = () => {
+	const emptyBoxes = Array.from(document.querySelectorAll('.app-main__body-box:not(.app-main__body-box--used)'));
+
+	for (let i = 0; i < emptyBoxes.length; i++) {
+		const box = emptyBoxes[i];
+		box.classList.add('app-main__body-box--used');
+		box.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
+		if (checkCanWin(cpuTeam)) {
+			box.removeEventListener('click', singleplayerGame);
+			return;
+		}
+		box.classList.remove('app-main__body-box--used');
+		box.innerHTML = '';
 	}
+
+	for (let i = 0; i < emptyBoxes.length; i++) {
+		const box = emptyBoxes[i];
+		box.classList.add('app-main__body-box--used');
+		box.innerHTML = `<img src="./dist/img/icons/icon-${playerTeam}.svg" alt="" class="app-main__body-box-img">`;
+		if (checkCanWin(playerTeam)) {
+			box.classList.remove('app-main__body-box--used');
+			box.innerHTML = '';
+			box.classList.add('app-main__body-box--used');
+			box.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
+			box.removeEventListener('click', singleplayerGame);
+			return;
+		}
+		box.classList.remove('app-main__body-box--used');
+		box.innerHTML = '';
+	}
+
+	const randomIndex = Math.floor(Math.random() * emptyBoxes.length);
+	const randomBox = emptyBoxes[randomIndex];
+	randomBox.classList.add('app-main__body-box--used');
+	randomBox.style.backgroundImage = '';
+	randomBox.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
+	randomBox.removeEventListener('click', singleplayerGame);
+};
+
+const makeHardMove = () => {
+	const emptyBoxes = Array.from(document.querySelectorAll('.app-main__body-box:not(.app-main__body-box--used)'));
+	const randomIndex = Math.floor(Math.random() * emptyBoxes.length);
+	const randomBox = emptyBoxes[randomIndex];
+	randomBox.classList.add('app-main__body-box--used');
+	randomBox.style.backgroundImage = '';
+	randomBox.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
 };
 
 const handleMoveResult = (tm, info) => {
@@ -326,11 +385,27 @@ const handleMoveResult = (tm, info) => {
 
 		return false;
 	} else {
-		startingTeam = startingTeam === 'o' ? 'x' : 'o';
-		currentTurnInfo.setAttribute('src', `./dist/img/icons/icon-${startingTeam}.svg`);
+		startingTeamSingleplayer = startingTeamSingleplayer === 'o' ? 'x' : 'o';
+		currentTurnInfo.setAttribute('src', `./dist/img/icons/icon-${startingTeamSingleplayer}.svg`);
 		return;
 	}
 
+	return false;
+};
+
+const checkCanWin = team => {
+	for (const condition of winConditions) {
+		const [a, b, c] = condition;
+		const winningBoxes = [appBoxes[a], appBoxes[b], appBoxes[c]];
+
+		if (
+			appBoxes[a].innerHTML === `<img src="./dist/img/icons/icon-${team}.svg" alt="" class="app-main__body-box-img">` &&
+			appBoxes[b].innerHTML === `<img src="./dist/img/icons/icon-${team}.svg" alt="" class="app-main__body-box-img">` &&
+			appBoxes[c].innerHTML === `<img src="./dist/img/icons/icon-${team}.svg" alt="" class="app-main__body-box-img">`
+		) {
+			return true;
+		}
+	}
 	return false;
 };
 
