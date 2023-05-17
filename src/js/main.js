@@ -19,7 +19,7 @@ let difficultyBtns;
 
 let isComputerTurn = false;
 let difficultyLevel;
-let startingTeam = 'x';
+let startingTeam;
 let startingTeamSingleplayer = 'x';
 let playerTeam = 'o';
 let cpuTeam = 'x';
@@ -99,9 +99,6 @@ const clearBoxes = () => {
 		box.style.backgroundImage = '';
 		box.style.transform = '';
 		box.innerHTML = '';
-		if (difficultyLevel === 'easy' || difficultyLevel === 'medium' || difficultyLevel === 'hard') {
-			box.addEventListener('click', singleplayerGame);
-		}
 	});
 };
 
@@ -127,6 +124,14 @@ const resetGame = () => {
 		clearBoxes();
 		clearWinnerBoardClass();
 	}, 1000);
+
+	setTimeout(() => {
+		if (difficultyLevel === 'easy' || difficultyLevel === 'medium' || difficultyLevel === 'hard') {
+			if (playerTeam === 'o') {
+				startSingleplayerGame();
+			}
+		}
+	}, 1001);
 };
 
 const handleTeam = () => {
@@ -161,13 +166,20 @@ const openMultiplayerGame = () => {
 };
 
 const startMultiplayerGame = () => {
+	startingTeam = 'x';
 	appBoxes.forEach(box => {
 		box.addEventListener('mouseenter', () => {
 			handleBoxHover(event, startingTeam);
 		});
-		box.addEventListener('mouseleave', handleBoxLeave);
+		box.addEventListener('focus', () => {
+			handleBoxHover(event, startingTeam);
+		});
+		box.addEventListener('mouseleave', hideBoxHover);
+		box.addEventListener('blur', hideBoxHover);
 		box.removeEventListener('click', singleplayerGame);
 		box.addEventListener('click', multiplayerGame);
+		box.removeEventListener('keydown', enterKeyForSingleplayer);
+		box.addEventListener('keydown', enterKeyForMultiplayer);
 	});
 };
 
@@ -240,10 +252,28 @@ const startSingleplayerGame = () => {
 		box.addEventListener('mouseenter', e => {
 			handleBoxHover(e, playerTeam);
 		});
-		box.addEventListener('mouseleave', handleBoxLeave);
+		box.addEventListener('focus', e => {
+			handleBoxHover(e, playerTeam);
+		});
+		box.addEventListener('mouseleave', hideBoxHover);
+		box.addEventListener('blur', hideBoxHover);
 		box.removeEventListener('click', multiplayerGame);
 		box.addEventListener('click', singleplayerGame);
+		box.removeEventListener('keydown', enterKeyForMultiplayer);
+		box.addEventListener('keydown', enterKeyForSingleplayer);
 	});
+
+	if (difficultyLevel === 'easy' || difficultyLevel === 'medium') {
+		if (playerTeam === 'o') {
+			makeEasyMove();
+			startingTeamSingleplayer = 'o';
+		}
+	} else if (difficultyLevel === 'hard') {
+		if (playerTeam === 'o') {
+			computerFirstMove();
+			startingTeamSingleplayer = 'o';
+		}
+	}
 };
 
 const changeTeams = () => {
@@ -300,6 +330,14 @@ const singleplayerGame = e => {
 	}
 };
 
+const computerFirstMove = () => {
+	const arr = Array.from(appBoxes);
+	arr[4].classList.add('app-main__body-box--used');
+	arr[4].style.backgroundImage = '';
+	arr[4].innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
+	arr[4].removeEventListener('click', singleplayerGame);
+};
+
 const makeEasyMove = () => {
 	const emptyBoxes = Array.from(document.querySelectorAll('.app-main__body-box:not(.app-main__body-box--used)'));
 	const randomIndex = Math.floor(Math.random() * emptyBoxes.length);
@@ -316,18 +354,6 @@ const makeNormalMove = () => {
 	for (let i = 0; i < emptyBoxes.length; i++) {
 		const box = emptyBoxes[i];
 		box.classList.add('app-main__body-box--used');
-		box.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
-		if (checkCanWin(cpuTeam)) {
-			box.removeEventListener('click', singleplayerGame);
-			return;
-		}
-		box.classList.remove('app-main__body-box--used');
-		box.innerHTML = '';
-	}
-
-	for (let i = 0; i < emptyBoxes.length; i++) {
-		const box = emptyBoxes[i];
-		box.classList.add('app-main__body-box--used');
 		box.innerHTML = `<img src="./dist/img/icons/icon-${playerTeam}.svg" alt="" class="app-main__body-box-img">`;
 		if (checkCanWin(playerTeam)) {
 			box.classList.remove('app-main__body-box--used');
@@ -335,6 +361,7 @@ const makeNormalMove = () => {
 			box.classList.add('app-main__body-box--used');
 			box.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
 			box.removeEventListener('click', singleplayerGame);
+			box.style.backgroundImage = '';
 			return;
 		}
 		box.classList.remove('app-main__body-box--used');
@@ -351,11 +378,43 @@ const makeNormalMove = () => {
 
 const makeHardMove = () => {
 	const emptyBoxes = Array.from(document.querySelectorAll('.app-main__body-box:not(.app-main__body-box--used)'));
+
+	for (let i = 0; i < emptyBoxes.length; i++) {
+		const box = emptyBoxes[i];
+		box.classList.add('app-main__body-box--used');
+		box.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
+		if (checkCanWin(cpuTeam)) {
+			box.removeEventListener('click', singleplayerGame);
+			box.style.backgroundImage = '';
+			return;
+		}
+		box.classList.remove('app-main__body-box--used');
+		box.innerHTML = '';
+	}
+
+	for (let i = 0; i < emptyBoxes.length; i++) {
+		const box = emptyBoxes[i];
+		box.classList.add('app-main__body-box--used');
+		box.innerHTML = `<img src="./dist/img/icons/icon-${playerTeam}.svg" alt="" class="app-main__body-box-img">`;
+		if (checkCanWin(playerTeam)) {
+			box.classList.remove('app-main__body-box--used');
+			box.innerHTML = '';
+			box.classList.add('app-main__body-box--used');
+			box.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
+			box.removeEventListener('click', singleplayerGame);
+			box.style.backgroundImage = '';
+			return;
+		}
+		box.classList.remove('app-main__body-box--used');
+		box.innerHTML = '';
+	}
+
 	const randomIndex = Math.floor(Math.random() * emptyBoxes.length);
 	const randomBox = emptyBoxes[randomIndex];
 	randomBox.classList.add('app-main__body-box--used');
 	randomBox.style.backgroundImage = '';
 	randomBox.innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
+	randomBox.removeEventListener('click', singleplayerGame);
 };
 
 const handleMoveResult = (tm, info) => {
@@ -439,6 +498,18 @@ const checkTie = () => {
 	return false;
 };
 
+const enterKeyForSingleplayer = e => {
+	if (e.key === 'Enter') {
+		singleplayerGame(e);
+	}
+};
+
+const enterKeyForMultiplayer = e => {
+	if (e.key === 'Enter') {
+		multiplayerGame(e);
+	}
+};
+
 const handleBoxHover = (e, tm) => {
 	const hoveredBox = e.target;
 
@@ -447,11 +518,11 @@ const handleBoxHover = (e, tm) => {
 	}
 };
 
-const handleBoxLeave = e => {
-	const leftBox = e.target;
+const hideBoxHover = e => {
+	const bluredBox = e.target;
 
-	if (!leftBox.classList.contains('app-main__body-box--used')) {
-		leftBox.style.backgroundImage = '';
+	if (!bluredBox.classList.contains('app-main__body-box--used')) {
+		bluredBox.style.backgroundImage = '';
 	}
 };
 
@@ -480,6 +551,7 @@ const summaryBoardAnimationOut = element => {
 	gsap.to('.summary-board-shadow--bottom', { duration: 0.5, height: '0', opacity: 0 });
 	gsap.to('.summary-board-shadow--top', { duration: 0.5, height: '0', opacity: 0 });
 	gsap.to(element, { duration: 0.5, delay: 0.5, right: '-110%', opacity: '0' });
+	gsap.to(element, { duration: 0.1, delay: 1, visibility: 'hidden' });
 	gsap.to('.app-main__body-box', {
 		duration: 0.3,
 		delay: 1,

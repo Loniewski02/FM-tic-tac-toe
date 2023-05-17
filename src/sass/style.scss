@@ -229,11 +229,12 @@ body {
 	}
 
 	&__body {
+		margin: 0 auto;
 		&-boxes {
 			display: grid;
 			place-items: center;
-			grid-template-columns: repeat(3, 96px);
-			grid-template-rows: repeat(3, 96px);
+			grid-template-columns: repeat(3, 70px);
+			grid-template-rows: repeat(3, 70px);
 			gap: 2rem;
 		}
 
@@ -437,6 +438,16 @@ body {
 	}
 }
 
+@media (min-width: 375px) {
+	.app-main {
+		&__body {
+			&-boxes {
+				grid-template-columns: repeat(3, 96px);
+				grid-template-rows: repeat(3, 96px);
+			}
+		}
+	}
+}
 @media (min-width: 768px) {
 	.wrapper {
 		max-width: 460px;
@@ -532,9 +543,6 @@ body {
 			letter-spacing: 2.5px;
 		}
 	}
-}
-
-@media (min-width: 992px) {
 }
 
 @keyframes grow {
