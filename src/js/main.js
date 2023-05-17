@@ -20,7 +20,7 @@ let difficultyBtns;
 let isComputerTurn = false;
 let difficultyLevel;
 let startingTeam;
-let startingTeamSingleplayer = 'x';
+let startingTeamSingleplayer;
 let playerTeam = 'o';
 let cpuTeam = 'x';
 let ties = 0;
@@ -127,9 +127,7 @@ const resetGame = () => {
 
 	setTimeout(() => {
 		if (difficultyLevel === 'easy' || difficultyLevel === 'medium' || difficultyLevel === 'hard') {
-			if (playerTeam === 'o') {
-				startSingleplayerGame();
-			}
+			startSingleplayerGame();
 		}
 	}, 1001);
 };
@@ -153,8 +151,10 @@ const teamPick = e => {
 
 		if (playerTeam === 'x') {
 			cpuTeam = 'o';
+			startingTeamSingleplayer = 'x';
 		} else if (playerTeam === 'o') {
 			cpuTeam = 'x';
+			startingTeamSingleplayer = 'o';
 		}
 	}
 };
@@ -248,6 +248,7 @@ const getDifficulty = e => {
 };
 
 const startSingleplayerGame = () => {
+	startingTeamSingleplayer = 'x';
 	appBoxes.forEach(box => {
 		box.addEventListener('mouseenter', e => {
 			handleBoxHover(e, playerTeam);
@@ -266,12 +267,10 @@ const startSingleplayerGame = () => {
 	if (difficultyLevel === 'easy' || difficultyLevel === 'medium') {
 		if (playerTeam === 'o') {
 			makeEasyMove();
-			startingTeamSingleplayer = 'o';
 		}
 	} else if (difficultyLevel === 'hard') {
 		if (playerTeam === 'o') {
 			computerFirstMove();
-			startingTeamSingleplayer = 'o';
 		}
 	}
 };
@@ -336,6 +335,7 @@ const computerFirstMove = () => {
 	arr[4].style.backgroundImage = '';
 	arr[4].innerHTML = `<img src="./dist/img/icons/icon-${cpuTeam}.svg" alt="" class="app-main__body-box-img">`;
 	arr[4].removeEventListener('click', singleplayerGame);
+	handleMoveResult(cpuTeam, 'oh no, you lost ...');
 };
 
 const makeEasyMove = () => {
@@ -448,14 +448,11 @@ const handleMoveResult = (tm, info) => {
 		currentTurnInfo.setAttribute('src', `./dist/img/icons/icon-${startingTeamSingleplayer}.svg`);
 		return;
 	}
-
-	return false;
 };
 
 const checkCanWin = team => {
 	for (const condition of winConditions) {
 		const [a, b, c] = condition;
-		const winningBoxes = [appBoxes[a], appBoxes[b], appBoxes[c]];
 
 		if (
 			appBoxes[a].innerHTML === `<img src="./dist/img/icons/icon-${team}.svg" alt="" class="app-main__body-box-img">` &&
