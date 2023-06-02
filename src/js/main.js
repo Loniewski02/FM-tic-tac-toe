@@ -16,6 +16,7 @@ let restartBtn;
 let cancelRestartBtn;
 let confirmRestartBtn;
 let difficultyBtns;
+let body;
 
 let isComputerTurn = false;
 let difficultyLevel;
@@ -63,6 +64,7 @@ const prepareDOMElements = () => {
 	restartBtn = document.querySelector('.app-main__nav-restart-btn');
 	cancelRestartBtn = document.querySelector('.summary-board__btn-restart--cancel');
 	confirmRestartBtn = document.querySelector('.summary-board__btn-restart--confirm');
+	body = document.body;
 };
 
 const prepareDOMEvents = () => {
@@ -523,6 +525,13 @@ const hideBoxHover = e => {
 	}
 };
 
+const setBodyOverflow = time => {
+	body.style.overflow = 'hidden';
+	setTimeout(() => {
+		body.style.overflow = 'visible';
+	}, time);
+};
+
 //GASP animations...
 
 const menuAnimationIn = () => {
@@ -557,6 +566,7 @@ const summaryBoardAnimationOut = element => {
 };
 
 const mainAppAnimationIn = () => {
+	setBodyOverflow(1000);
 	gsap.to('.app-main', { duration: 1, bottom: '0', opacity: '1', height: '100%', display: 'flex' });
 	gsap.to('.app-main__body-box', {
 		duration: 0.5,
@@ -573,6 +583,7 @@ const mainAppAnimationIn = () => {
 };
 
 const mainAppAnimationOut = () => {
+	setBodyOverflow(1800);
 	gsap.to('.app-main', { duration: 1, delay: 0.8, bottom: '-50%', opacity: '0', height: '0' });
 	gsap.to('.app-main', { duration: 0.1, delay: 1.5, display: 'none' });
 	gsap.to('.app-main__body-box', {
