@@ -31,7 +31,7 @@ Users should be able to:
 
 ### Links
 
-- Solution URL: [Code](https://github.com/Loniewski02/FM-tic-tac-toe)
+- Solution URL: [Solution](https://www.frontendmentor.io/solutions/tic-tac-toe-game-4hnZdSUOEu)
 - Live Site URL: [Live](https://loniewski02.github.io/FM-tic-tac-toe/)
 
 ## My process
